@@ -9,8 +9,10 @@ public class Main {
 
         StackOverflowService stackOverflowService = new StackOverflowService();
         stackOverflowService.submitDocument(client, "java");
+        stackOverflowService.submitDocument(client, "python");
 
         HastebinService hastebinService = new HastebinService();
         System.out.println(hastebinService.submitDocument(client));
+
     }
 }

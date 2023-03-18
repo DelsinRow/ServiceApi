@@ -1,5 +1,5 @@
 package org.orioninc;
 
-public record Questions(String title) {
+public record Questions(String[] title) {
 
 }
