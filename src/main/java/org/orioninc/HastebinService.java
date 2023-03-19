@@ -12,7 +12,7 @@ public class HastebinService {
     private final static String BEARER_TOKEN_HASTEBIN = System.getenv("TOKEN_HASTEBIN");
     private final static String API_ENDPOINTS_HASTEBIN = "https://hastebin.com";
     private final static String POST_ROUTE_HASTEBIN = "/documents";
-    String allQuestions = QuestionsOutput.test(StackOverflowService.questionsList);
+    String allQuestions = QuestionsOutput.Questions(StackOverflowService.questionsList);
 
     HttpRequest requestPost = HttpRequest.newBuilder()
             .uri(URI.create(API_ENDPOINTS_HASTEBIN + POST_ROUTE_HASTEBIN))
@@ -21,12 +21,12 @@ public class HastebinService {
             .POST(HttpRequest.BodyPublishers.ofString(allQuestions))
             .build();
 
-    public String submitDocument(HttpClient client) throws IOException, InterruptedException {
+    public void submitDocument(HttpClient client) throws IOException, InterruptedException {
         HttpResponse<String> response = client.send(requestPost, HttpResponse.BodyHandlers.ofString());
         String HastebinString = response.body();
         ObjectMapper objectMapper = new ObjectMapper();
         HastebinResponse hastebinResponse = objectMapper.readValue(HastebinString, HastebinResponse.class);
-        return "Link: " + "https://hastebin.com/share/" + hastebinResponse.getKey() + ".sql";
+        System.out.println("Link: " + "https://hastebin.com/share/" + hastebinResponse.getKey() + ".sql");
 
     }
 }

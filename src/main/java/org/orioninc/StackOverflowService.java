@@ -10,7 +10,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -24,16 +23,15 @@ public class StackOverflowService {
     private String urlWithLanguage(String language) {
         return API_ENDPOINTS_STACKOVERFLOW + "/2.3/questions?pagesize=" + numberOfQuestion + "&order=desc&sort=creation&tagged=" + language + "&site=stackoverflow&filter=!.yIW41g8Y3qudKNa";
     }
-//    private String urlWithLanguage(String language, int numberOfQuestions) {
-//        return API_ENDPOINTS_STACKOVERFLOW + "/2.3/questions?pagesize=" + numberOfQuestions + "&order=desc&sort=creation&tagged=" + language + "&site=stackoverflow&filter=!.yIW41g8Y3qudKNa";
-//    }
-    public void submitDocument(HttpClient client, String language) throws IOException, InterruptedException {
+
+    public void submitDocument(HttpClient client, Languages language) throws IOException, InterruptedException {
         String[] questionsArray = new String[numberOfQuestion + 1];
-        String titleOfArray = "-----> " + language + " <-----";
+        String titleOfArray = "-----> " + language.getLanguageName() + " <-----";
         questionsArray[0] = titleOfArray;
         int questionCount = 0;
+
         HttpRequest requestGet = HttpRequest.newBuilder()
-                .uri(URI.create(urlWithLanguage(language)))
+                .uri(URI.create(urlWithLanguage(language.getLanguageRequest())))
                 .header("Content-Type", "text/plain; charset=UTF-8")
                 .GET()
                 .build();
@@ -41,13 +39,12 @@ public class StackOverflowService {
         HttpResponse<byte[]> responseStackOverFlow = client.send(requestGet, HttpResponse.BodyHandlers.ofByteArray());
         GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(responseStackOverFlow.body()));
         String stackoverFlowJsonString = new String(gis.readAllBytes(), StandardCharsets.UTF_8);
-
         ObjectMapper objectMapper = new ObjectMapper();
-
         StackOverflowItemsArray stackOverflowItemsArray = objectMapper.readValue(stackoverFlowJsonString, StackOverflowItemsArray.class);
 
         for (StackOverFlowItemsWrapper items : stackOverflowItemsArray.getItems()) {
-            questionsArray[questionCount + 1] = items.getTitle();
+            int index = questionCount + 1;
+            questionsArray[index] = index + ") " + items.getTitle().replace("&#39;", "'");
             questionCount++;
         }
         questionsList.add(new Questions(questionsArray));

@@ -37,4 +37,8 @@ public class StackOverFlowItemsWrapper {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public void asd() {
+
+    }
 }
