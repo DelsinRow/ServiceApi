@@ -2,8 +2,10 @@ package org.orioninc;
 
 import java.util.List;
 
+
 public class QuestionsOutput {
-    static String Questions(List<Questions> list) {
+
+    public static String Questions(List<Questions> list) {
         StringBuilder sb = new StringBuilder();
 
         for (Questions questions : list) {

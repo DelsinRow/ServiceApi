@@ -1,5 +1,7 @@
 package org.orioninc;
 
-public record Questions(String[] title) {
+import java.util.List;
+
+public record Questions(List<String> title) {
 
 }
