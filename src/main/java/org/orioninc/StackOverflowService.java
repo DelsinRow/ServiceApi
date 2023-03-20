@@ -2,14 +2,11 @@ package org.orioninc;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.orioninc.Languages;
-import org.orioninc.Questions;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -40,7 +37,6 @@ public class StackOverflowService {
         ObjectMapper objectMapper = new ObjectMapper();
         StackOverflowItemsArray stackOverflowItemsArray = objectMapper.readValue(stackoverFlowJsonString, StackOverflowItemsArray.class);
         allQuestionsList.add(new Questions(questionsList(language, stackOverflowItemsArray)));
-
         }
 
     private List<String> questionsList(Languages language, StackOverflowItemsArray stackOverflowItemsArray) throws UnsupportedEncodingException {

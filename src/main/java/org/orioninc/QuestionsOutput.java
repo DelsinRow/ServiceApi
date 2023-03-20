@@ -2,7 +2,6 @@ package org.orioninc;
 
 import java.util.List;
 
-
 public class QuestionsOutput {
 
     public static String Questions(List<Questions> list) {
