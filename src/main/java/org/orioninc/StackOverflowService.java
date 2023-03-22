@@ -89,7 +89,7 @@ public class StackOverflowService {
         return questions;
     }
 
-    void addQuestionsToFinalList(CompletableFuture<Questions> cf) {
+    public void addQuestionsToFinalList(CompletableFuture<Questions> cf) {
         Questions question;
         try {
             question = cf.get();
