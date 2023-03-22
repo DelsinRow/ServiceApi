@@ -1,6 +1,7 @@
 package org.orioninc;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.ByteArrayInputStream;
@@ -13,33 +14,29 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.GZIPInputStream;
 
 public class StackOverflowService {
     private final static String API_ENDPOINTS_STACKOVERFLOW = "https://api.stackexchange.com";
     private static int numberOfQuestion = 10;
     public List<Questions> allQuestionsList = new ArrayList<>();
+    private HttpClient client;
 
     private static String urlWithLanguage(String language) {
         return API_ENDPOINTS_STACKOVERFLOW + "/2.3/questions?pagesize=" + numberOfQuestion + "&order=desc&sort=creation&tagged=" + language + "&site=stackoverflow&filter=!.yIW41g8Y3qudKNa";
     }
 
-    public void getQuestions(HttpClient client, Languages language) throws IOException, InterruptedException {
-        HttpRequest requestGet = HttpRequest.newBuilder()
+    HttpRequest getRequest(Languages language) {
+        return HttpRequest.newBuilder()
                 .uri(URI.create(urlWithLanguage(language.getLanguageRequest())))
                 .header("Content-Type", "text/plain; charset=UTF-8")
                 .GET()
                 .build();
-
-        HttpResponse<byte[]> responseStackOverFlow = client.sendAsync(requestGet, HttpResponse.BodyHandlers.ofByteArray()).join();
-        GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(responseStackOverFlow.body()));
-        String stackoverFlowJsonString = new String(gis.readAllBytes(), StandardCharsets.UTF_8);
-        ObjectMapper objectMapper = new ObjectMapper();
-        StackOverflowItemsArray stackOverflowItemsArray = objectMapper.readValue(stackoverFlowJsonString, StackOverflowItemsArray.class);
-        allQuestionsList.add(new Questions(questionsList(language, stackOverflowItemsArray)));
     }
 
-    private List<String> questionsList(Languages language, StackOverflowItemsArray stackOverflowItemsArray) {
+    private List<String> questionsList(Languages language, StackOverflowItemsArray stackOverflowItemsArray) throws JsonProcessingException {
         List<String> questionsList = new ArrayList<>();
         int questionIndex = 1;
 
@@ -51,11 +48,68 @@ public class StackOverflowService {
         return questionsList;
     }
 
+    public CompletableFuture<Questions> sendRequest(Languages language) {
+        HttpRequest requestGet = getRequest(language);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        CompletableFuture<Questions> questions;
+        try {
+            questions = client.sendAsync(requestGet, HttpResponse.BodyHandlers.ofByteArray())
+                    .thenApply(byteArray -> {
+                        try {
+                            return new GZIPInputStream(new ByteArrayInputStream(byteArray.body()));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .thenApply(bytes -> {
+                        try {
+                            return new String(bytes.readAllBytes(), StandardCharsets.UTF_8);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .thenApply(string -> {
+                        try {
+                            return objectMapper.readValue(string, StackOverflowItemsArray.class);
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .thenApply(stringArray -> {
+                        try {
+                            return new Questions(questionsList(language, stringArray));
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return questions;
+    }
+
+    void addQuestionsToFinalList(CompletableFuture<Questions> cf) {
+        Questions question;
+        try {
+            question = cf.get();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+        allQuestionsList.add(question);
+    }
+
     public List<Questions> getAllQuestionsList() {
         return allQuestionsList;
     }
 
-    static class StackOverflowItemsArray {
+    public StackOverflowService(HttpClient client) {
+        this.client = client;
+    }
+
+    private static class StackOverflowItemsArray {
         List<StackOverFlowItemsWrapper> items;
 
         public StackOverflowItemsArray() {
@@ -71,7 +125,7 @@ public class StackOverflowService {
         }
     }
 
-    static class StackOverFlowItemsWrapper {
+    private static class StackOverFlowItemsWrapper {
         private String creationDate;
         private String questionId;
         private String title;
@@ -108,6 +162,3 @@ public class StackOverflowService {
     }
 
 }
-
-
-
