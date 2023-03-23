@@ -13,6 +13,7 @@ public class Main {
 
         StackOverflowService stackOverflowService = new StackOverflowService(client);
 
+
         CompletableFuture<Questions> python = stackOverflowService.sendRequest(Languages.PYTHON);
         CompletableFuture<Questions> java = stackOverflowService.sendRequest(Languages.JAVA);
         CompletableFuture<Questions> sql = stackOverflowService.sendRequest(Languages.SQL);
