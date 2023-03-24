@@ -48,5 +48,6 @@ public class Main {
         hastebinService.submitDocument(allQuestions);
 
         System.out.printf("Done in %dms\n", Duration.ofNanos(System.nanoTime() - start).toMillis());
+
     }
 }

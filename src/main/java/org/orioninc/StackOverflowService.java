@@ -47,6 +47,10 @@ public class StackOverflowService {
         }
         return questionsList;
     }
+//    private String decodeString (StackOverFlowItemsWrapper items) {
+//
+//        return URLDecoder.decode(items.getTitle(), StandardCharsets.UTF_8);
+//    }
 
     public CompletableFuture<Questions> sendRequest(Languages language) {
         HttpRequest requestGet = getRequest(language);
