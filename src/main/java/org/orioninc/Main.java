@@ -1,6 +1,8 @@
 package org.orioninc;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -41,11 +43,11 @@ public class Main {
         stackOverflowService.addQuestionsToFinalList(php);
 
         allQuestions = QuestionsOutput.Questions(stackOverflowService.getAllQuestionsList());
+        allQuestions = "QuestionsOutput.Questions(stackOverflowService.getAllQuestionsList())";
 
         HastebinService hastebinService = new HastebinService();
         hastebinService.submitDocument(allQuestions);
 
         System.out.printf("Done in %dms\n", Duration.ofNanos(System.nanoTime() - start).toMillis());
-
     }
 }

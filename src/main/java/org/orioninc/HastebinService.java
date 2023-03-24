@@ -12,35 +12,17 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class HastebinService {
-    private final static String BEARER_TOKEN_HASTEBIN = "Bearer " + System.getenv("token");
+    private final static String BEARER_TOKEN_HASTEBIN = "Bearer " + System.getenv("TOKEN_HASTEBIN");
     private final static String API_ENDPOINTS_HASTEBIN = "https://hastebin.com";
     private final static String POST_ROUTE_HASTEBIN = "/documents";
 
-    private String inputToken(String newToken) {
-        String enterToken;
-        System.out.print("Enter token: ");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        try {
-            enterToken = reader.readLine();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        if (enterToken.isEmpty()){
-            newToken = BEARER_TOKEN_HASTEBIN;
-        } else {
-            newToken = "Bearer " + enterToken;
-        }
-        return newToken;
-    }
     public void submitDocument(String allStringQuestions) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
-        String newToken = null;
-        newToken = inputToken(newToken);
 
         HttpRequest requestPost = HttpRequest.newBuilder()
                 .uri(URI.create(API_ENDPOINTS_HASTEBIN + POST_ROUTE_HASTEBIN))
                 .header("Content-Type", "text/plain; charset=UTF-8")
-                .header("Authorization", newToken)
+                .header("Authorization", BEARER_TOKEN_HASTEBIN)
                 .POST(HttpRequest.BodyPublishers.ofString(allStringQuestions))
                 .build();
 
