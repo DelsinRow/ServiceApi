@@ -43,7 +43,6 @@ public class Main {
         stackOverflowService.addQuestionsToFinalList(php);
 
         allQuestions = QuestionsOutput.Questions(stackOverflowService.getAllQuestionsList());
-        allQuestions = "QuestionsOutput.Questions(stackOverflowService.getAllQuestionsList())";
 
         HastebinService hastebinService = new HastebinService();
         hastebinService.submitDocument(allQuestions);
