@@ -8,7 +8,7 @@ COPY ./ ./
 RUN mvn clean package
 
 # the second stage of our build will use open jdk 19
-FROM openjdk:21-slim-buster
+FROM openjdk:19
 
 # copy only the artifacts we need from the first stage and discard the rest
 COPY --from=MAVEN_BUILD /target/ServiceAPI-1.0-SNAPSHOT-jar-with-dependencies.jar /ServiceAPI.jar

@@ -28,7 +28,11 @@ public class StackOverflowService {
         return API_ENDPOINTS_STACKOVERFLOW + "/2.3/questions?pagesize=" + numberOfQuestion + "&order=desc&sort=creation&tagged=" + language + "&site=stackoverflow&filter=!.yIW41g8Y3qudKNa";
     }
 
-    HttpRequest getRequest(Languages language) {
+    public StackOverflowService(HttpClient client) {
+        this.client = client;
+    }
+
+    private HttpRequest requestConnection(Languages language) {
         return HttpRequest.newBuilder()
                 .uri(URI.create(urlWithLanguage(language.getLanguageRequest())))
                 .header("Content-Type", "text/plain; charset=UTF-8")
@@ -47,13 +51,9 @@ public class StackOverflowService {
         }
         return questionsList;
     }
-//    private String decodeString (StackOverFlowItemsWrapper items) {
-//
-//        return URLDecoder.decode(items.getTitle(), StandardCharsets.UTF_8);
-//    }
 
     public CompletableFuture<Questions> sendRequest(Languages language) {
-        HttpRequest requestGet = getRequest(language);
+        HttpRequest requestGet = requestConnection(language);
         ObjectMapper objectMapper = new ObjectMapper();
 
         CompletableFuture<Questions> questions;
@@ -109,10 +109,6 @@ public class StackOverflowService {
         return allQuestionsList;
     }
 
-    public StackOverflowService(HttpClient client) {
-        this.client = client;
-    }
-
     private static class StackOverflowItemsArray {
         List<StackOverFlowItemsWrapper> items;
 
@@ -165,4 +161,7 @@ public class StackOverflowService {
         }
     }
 
+    public static int getNumberOfQuestion() {
+        return numberOfQuestion;
+    }
 }
