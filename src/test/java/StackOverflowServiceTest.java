@@ -1,4 +1,3 @@
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.orioninc.Languages;
@@ -21,11 +20,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class StackOverflowServiceTest {
-    private static int numberOfQuestion = 10;
+
     private HttpClient mockClient = mock(HttpClient.class);
     private StackOverflowService stackOverflowService = new StackOverflowService(mockClient);
     private Languages language = Languages.JAVA;
-
+    private String word = "\"title\"";
     @Test
     public void correctUrlWithLanguage() {
 
@@ -65,15 +64,15 @@ public class StackOverflowServiceTest {
         when(mockClient.sendAsync(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
                 .thenReturn(CompletableFuture.completedFuture(mockResponse));
         questions = stackOverflowService.sendRequest(Languages.JAVA);
-        String word = "title\"question_id\"";
+
         long count = Arrays
                 .stream(responseJson.split("\\s+"))
                 .filter(word::equals)
                 .count() + 1;
         Assert.assertNotNull(questions.get().title());
-        Assert.assertEquals(questions.get().title().get(0), ("-----> " + language.getLanguageName() + " <-----"));
-        Assert.assertEquals(questions.get().title().get(indexArrayTest).length(), (indexArrayTest + ") Load resources file before all test execution in JUnit").length());
-        Assert.assertEquals(questions.get().title().size() - 1, count);
+        Assert.assertEquals(("-----> " + language.getLanguageName() + " <-----"), questions.get().title().get(0));
+        Assert.assertEquals((indexArrayTest + ") Load resources file before all test execution in JUnit").length(), questions.get().title().get(indexArrayTest).length());
+        Assert.assertEquals(count, questions.get().title().size() - 1);
 
     }
 }

@@ -14,14 +14,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * POST bodypublisher not null
- * запрос не уходит на сервер, если не указан Токен
- * Возвращаемое боди не пустое
- * ответ содержит "https://hastebin.com/share/"
- * response.body() not NULL
- */
-
 public class HastebinServiceTest {
     private static HttpClient mockClient;
 
@@ -46,7 +38,7 @@ public class HastebinServiceTest {
         String result = objectMapper
                 .readValue(json, HastebinService.HastebinResponse.class)
                 .getKey();
-        Assert.assertEquals(result, "testvalue");
+        Assert.assertEquals("testvalue", result);
     }
 
 }
