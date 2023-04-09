@@ -7,12 +7,15 @@ import java.util.concurrent.CompletableFuture;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
+        String token = System.getenv("TOKEN");
+        String key;
         String allQuestions;
         HttpClient client = HttpClient.newHttpClient();
         final long start = System.nanoTime();
 
         StackOverflowService stackOverflowService = new StackOverflowService(client);
-
+        HastebinService hastebinService = new HastebinService(client);
+        StorageService storageService = new StorageService(client);
 
         CompletableFuture<Questions> python = stackOverflowService.sendRequest(Languages.PYTHON);
         CompletableFuture<Questions> java = stackOverflowService.sendRequest(Languages.JAVA);
@@ -42,10 +45,14 @@ public class Main {
 
         allQuestions = QuestionsOutput.questions(stackOverflowService.getAllQuestionsList());
 
-        HastebinService hastebinService = new HastebinService(client);
-        String key = hastebinService.submitDocument(allQuestions);
-        System.out.println("Link: " + "https://hastebin.com/share/" + key);
-        System.out.printf("Done in %dms\n", Duration.ofNanos(System.nanoTime() - start).toMillis());
+        if (token == null) {
+            key = storageService.submitDocument(allQuestions);
+            System.out.println("Link: " + "http://localhost:8080/document/get/" + key);
+        } else {
+            key = hastebinService.submitDocument(allQuestions);
+            System.out.println("Link: " + "https://hastebin.com/share/" + key);
+        }
 
+        System.out.printf("Done in %dms\n", Duration.ofNanos(System.nanoTime() - start).toMillis());
     }
 }
