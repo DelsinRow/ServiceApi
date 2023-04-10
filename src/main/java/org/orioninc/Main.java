@@ -7,7 +7,6 @@ import java.util.concurrent.CompletableFuture;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
-        String token = System.getenv("TOKEN");
         String key;
         String allQuestions;
         HttpClient client = HttpClient.newHttpClient();
@@ -45,10 +44,10 @@ public class Main {
 
         allQuestions = QuestionsOutput.questions(stackOverflowService.getAllQuestionsList());
 
-        if (token == null) {
+        if (System.getenv("SERVICE").equals("storage")) {
             key = storageService.submitDocument(allQuestions);
             System.out.println("Link: " + "http://localhost:8080/document/get/" + key);
-        } else {
+        } else if (System.getenv("SERVICE").equals("hastebin")) {
             key = hastebinService.submitDocument(allQuestions);
             System.out.println("Link: " + "https://hastebin.com/share/" + key);
         }
