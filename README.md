@@ -1,7 +1,7 @@
 **How to launch JAR-file**
 
 You need TOKEN to use Hastebin service, generate new TOKEN with GitHub-account \
-Get TOKEN here: https://www.toptal.com/developers/hastebin/documentation \
+Get TOKEN here: https://www.toptal.com/developers/hastebin/documentation 
 
 
 ===>Launch the output in HASTEBIN service<===
