@@ -23,12 +23,15 @@ public class StackOverflowService {
     private static int numberOfQuestion = 10;
     public List<Questions> allQuestionsList = new ArrayList<>();
     private HttpClient client;
-
     private static String urlWithLanguage(String language) {
         return API_ENDPOINTS_STACKOVERFLOW + "/2.3/questions?pagesize=" + numberOfQuestion + "&order=desc&sort=creation&tagged=" + language + "&site=stackoverflow&filter=!.yIW41g8Y3qudKNa";
     }
 
-    HttpRequest getRequest(Languages language) {
+    public StackOverflowService(HttpClient client) {
+        this.client = client;
+    }
+
+    private HttpRequest requestConnection(Languages language) {
         return HttpRequest.newBuilder()
                 .uri(URI.create(urlWithLanguage(language.getLanguageRequest())))
                 .header("Content-Type", "text/plain; charset=UTF-8")
@@ -49,7 +52,7 @@ public class StackOverflowService {
     }
 
     public CompletableFuture<Questions> sendRequest(Languages language) {
-        HttpRequest requestGet = getRequest(language);
+        HttpRequest requestGet = requestConnection(language);
         ObjectMapper objectMapper = new ObjectMapper();
 
         CompletableFuture<Questions> questions;
@@ -57,6 +60,7 @@ public class StackOverflowService {
             questions = client.sendAsync(requestGet, HttpResponse.BodyHandlers.ofByteArray())
                     .thenApply(byteArray -> {
                         try {
+//                            System.out.println("byte array: " + byteArray);
                             return new GZIPInputStream(new ByteArrayInputStream(byteArray.body()));
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -64,6 +68,7 @@ public class StackOverflowService {
                     })
                     .thenApply(bytes -> {
                         try {
+//                            System.out.println("bytes: " + bytes);
                             return new String(bytes.readAllBytes(), StandardCharsets.UTF_8);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -71,6 +76,7 @@ public class StackOverflowService {
                     })
                     .thenApply(string -> {
                         try {
+//                            System.out.println("string: " + string);
                             return objectMapper.readValue(string, StackOverflowItemsArray.class);
                         } catch (JsonProcessingException e) {
                             throw new RuntimeException(e);
@@ -105,11 +111,7 @@ public class StackOverflowService {
         return allQuestionsList;
     }
 
-    public StackOverflowService(HttpClient client) {
-        this.client = client;
-    }
-
-    private static class StackOverflowItemsArray {
+    public static class StackOverflowItemsArray {
         List<StackOverFlowItemsWrapper> items;
 
         public StackOverflowItemsArray() {
@@ -123,6 +125,7 @@ public class StackOverflowService {
         public void setItems(List<StackOverFlowItemsWrapper> items) {
             this.items = items;
         }
+
     }
 
     private static class StackOverFlowItemsWrapper {
@@ -159,6 +162,14 @@ public class StackOverflowService {
         public void setTitle(String title) {
             this.title = title;
         }
+    }
+
+    public static int getNumberOfQuestion() {
+        return numberOfQuestion;
+    }
+
+    public static String getUrlWithLanguage(String language) {
+        return urlWithLanguage(language);
     }
 
 }

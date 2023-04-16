@@ -4,7 +4,7 @@ import java.util.List;
 
 public class QuestionsOutput {
 
-    public static String Questions(List<Questions> list) {
+    public static String questions(List<Questions> list) {
         StringBuilder sb = new StringBuilder();
 
         for (Questions questions : list) {

@@ -1,6 +1,25 @@
 **How to launch JAR-file**
 
-Need to generate new TOKEN with GitHub-account \
+You need TOKEN to use Hastebin service, generate new TOKEN with GitHub-account \
 Get TOKEN here: https://www.toptal.com/developers/hastebin/documentation \
-Enter the command in any terminal: **java -jar ServiceAPI-1.0-SNAPSHOT-jar-with-dependencies.jar**** \
-Enter your token in the field
+
+
+===>Launch the output in HASTEBIN service<===
+
+before running -jar file enter: \
+export SERVICE=hastebin \
+export TOKEN='your token'
+java -jar 'jar_file_name'.jar 
+
+where 'your token' - is value of token \
+'jar_file_name' - name of jar-file
+
+
+
+===>Launch the output in STORAGE service<===\
+
+To launch in Terminal enter the command: SERVICE=storage java -jar 'jar_file_name'.jar
+where 'jar_file_name' - name of jar-file
+
+
+
