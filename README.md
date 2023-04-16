@@ -8,8 +8,9 @@ Get TOKEN here: https://www.toptal.com/developers/hastebin/documentation \
 
 before running -jar file enter: \
 export SERVICE=hastebin \
-export TOKEN='your token'
-java -jar 'jar_file_name'.jar 
+export TOKEN='your token' \
+
+then enter command: java -jar 'jar_file_name'.jar 
 
 where 'your token' - is value of token \
 'jar_file_name' - name of jar-file
