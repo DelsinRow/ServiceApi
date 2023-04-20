@@ -10,7 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class StorageService {
-    private final static String API_ENDPOINTS_STORAGESERVICE = "http://localhost:8080";
+    private final static String API_ENDPOINTS_STORAGESERVICE = System.getenv("API_ENDPOINT_STORAGESERVICE");
     private final static String POST_ROUTE_STORAGESERVICE = "/document/post";
     private final HttpClient client;
 
