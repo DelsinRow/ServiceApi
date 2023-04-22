@@ -46,7 +46,7 @@ public class Main {
 
         if (System.getenv("SERVICE").equals("storage")) {
             key = storageService.submitDocument(allQuestions);
-            System.out.println("Link: " + "http://localhost:8080/document/get/" + key);
+            System.out.println("Link: " + System.getenv("FQDN") + "/document/get/" + key);
         } else if (System.getenv("SERVICE").equals("hastebin")) {
             key = hastebinService.submitDocument(allQuestions);
             System.out.println("Link: " + "https://hastebin.com/share/" + key);
