@@ -14,7 +14,7 @@ public class Main {
 
         StackOverflowService stackOverflowService = new StackOverflowService(client);
         HastebinService hastebinService = new HastebinService(client);
-        StorageService storageService = new StorageService(client);
+        StorageService storageService = new StorageService(client, stackOverflowService);
 
         CompletableFuture<Questions> python = stackOverflowService.sendRequest(Languages.PYTHON);
         CompletableFuture<Questions> java = stackOverflowService.sendRequest(Languages.JAVA);
@@ -27,9 +27,7 @@ public class Main {
         CompletableFuture<Questions> js = stackOverflowService.sendRequest(Languages.JAVASCRIPT);
         CompletableFuture<Questions> php = stackOverflowService.sendRequest(Languages.PHP);
 
-        CompletableFuture.allOf(
-                python, java, sql, css, cSharp, cPlus, html, ruby, js, php
-        ).join();
+        CompletableFuture.allOf(python, java, sql, css, cSharp, cPlus, html, ruby, js, php).join();
 
         stackOverflowService.addQuestionsToFinalList(python);
         stackOverflowService.addQuestionsToFinalList(java);
@@ -46,7 +44,7 @@ public class Main {
 
         if (System.getenv("SERVICE").equals("storage")) {
             key = storageService.submitDocument(allQuestions);
-            System.out.println("Link: " + System.getenv("FQDN") + "/document/get/" + key);
+            System.out.println("Link: " + System.getenv("FQDN") + "/document/" + key);
         } else if (System.getenv("SERVICE").equals("hastebin")) {
             key = hastebinService.submitDocument(allQuestions);
             System.out.println("Link: " + "https://hastebin.com/share/" + key);
