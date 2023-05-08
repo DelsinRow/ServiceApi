@@ -22,6 +22,7 @@ public class StackOverflowService {
     private final static String API_ENDPOINTS_STACKOVERFLOW = "https://api.stackexchange.com";
     private static int numberOfQuestion = 10;
     public List<Questions> allQuestionsList = new ArrayList<>();
+    public List<String> listOfLanguageInRequest = new ArrayList<>();
     private HttpClient client;
     private static String urlWithLanguage(String language) {
         return API_ENDPOINTS_STACKOVERFLOW + "/2.3/questions?pagesize=" + numberOfQuestion + "&order=desc&sort=creation&tagged=" + language + "&site=stackoverflow&filter=!.yIW41g8Y3qudKNa";
@@ -32,6 +33,7 @@ public class StackOverflowService {
     }
 
     private HttpRequest requestConnection(Languages language) {
+        addLanguageInListOfLanguageInRequest(language);
         return HttpRequest.newBuilder()
                 .uri(URI.create(urlWithLanguage(language.getLanguageRequest())))
                 .header("Content-Type", "text/plain; charset=UTF-8")
@@ -42,7 +44,6 @@ public class StackOverflowService {
     private List<String> questionsList(Languages language, StackOverflowItemsArray stackOverflowItemsArray) throws JsonProcessingException {
         List<String> questionsList = new ArrayList<>();
         int questionIndex = 1;
-
         questionsList.add("-----> " + language.getLanguageName() + " <-----");
         for (StackOverFlowItemsWrapper items : stackOverflowItemsArray.getItems()) {
             questionsList.add(questionIndex + ") " + URLDecoder.decode(items.getTitle(), StandardCharsets.UTF_8));
@@ -93,6 +94,14 @@ public class StackOverflowService {
             throw new RuntimeException(e);
         }
         return questions;
+    }
+
+    private void addLanguageInListOfLanguageInRequest(Languages language) {
+        listOfLanguageInRequest.add(language.getLanguageName());
+    }
+
+    public List<String> getListOfLanguageInRequest() {
+        return listOfLanguageInRequest;
     }
 
     public void addQuestionsToFinalList(CompletableFuture<Questions> cf) {
