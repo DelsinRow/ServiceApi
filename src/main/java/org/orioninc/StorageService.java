@@ -15,6 +15,7 @@ import java.util.List;
 public class StorageService {
     private final static String API_ENDPOINTS_STORAGESERVICE = System.getenv("API_ENDPOINT_STORAGESERVICE");
     private final static String POST_ROUTE_STORAGESERVICE = "/api/document";
+    private final static String HEADER_SOURCE = "ServiceAPI";
     private final HttpClient client;
     private final StackOverflowService stackOverflowService;
 
@@ -38,6 +39,7 @@ public class StorageService {
                 .uri(URI.create(API_ENDPOINTS_STORAGESERVICE + POST_ROUTE_STORAGESERVICE))
                 .header("Content-Type", "text/plain; charset=UTF-8")
                 .setHeader("title", customTitle(stackOverflowService.getListOfLanguageInRequest()))
+                .setHeader("source", HEADER_SOURCE)
                 .POST(HttpRequest.BodyPublishers.ofString(allStringQuestions))
                 .build();
 
@@ -51,6 +53,7 @@ public class StorageService {
     public static class StorageServiceResponse {
         private String key;
         private String title;
+        private String source;
         private String date;
 
         @JsonProperty("key")
@@ -61,6 +64,11 @@ public class StorageService {
         @JsonProperty("title")
         public String getTitle() {
             return title;
+        }
+
+        @JsonProperty("source")
+        public String getSource() {
+            return source;
         }
 
         @JsonProperty("date")

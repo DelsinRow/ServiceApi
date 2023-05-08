@@ -27,7 +27,9 @@ public class Main {
         CompletableFuture<Questions> js = stackOverflowService.sendRequest(Languages.JAVASCRIPT);
         CompletableFuture<Questions> php = stackOverflowService.sendRequest(Languages.PHP);
 
-        CompletableFuture.allOf(python, java, sql, css, cSharp, cPlus, html, ruby, js, php).join();
+        CompletableFuture.allOf(python
+                , java, sql, css, cSharp, cPlus, html, ruby, js, php
+        ).join();
 
         stackOverflowService.addQuestionsToFinalList(python);
         stackOverflowService.addQuestionsToFinalList(java);
