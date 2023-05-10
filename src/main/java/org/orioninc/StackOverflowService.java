@@ -19,13 +19,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.zip.GZIPInputStream;
 
 public class StackOverflowService {
-    private final static String API_ENDPOINTS_STACKOVERFLOW = "https://api.stackexchange.com";
-    private static int numberOfQuestion = 10;
     public List<Questions> allQuestionsList = new ArrayList<>();
     public List<String> listOfLanguageInRequest = new ArrayList<>();
     private HttpClient client;
     private static String urlWithLanguage(String language) {
-        return API_ENDPOINTS_STACKOVERFLOW + "/2.3/questions?pagesize=" + numberOfQuestion + "&order=desc&sort=creation&tagged=" + language + "&site=stackoverflow&filter=!.yIW41g8Y3qudKNa";
+        return ConstantValues.API_ENDPOINT_STACKOVERFLOW + "/2.3/questions?pagesize=" + ConstantValues.NUMBER_OF_QUESTIONS_FROM_STACKOVERFLOW + "&order=desc&sort=creation&tagged=" + language + "&site=stackoverflow&filter=!.yIW41g8Y3qudKNa";
     }
 
     public StackOverflowService(HttpClient client) {
@@ -173,12 +171,9 @@ public class StackOverflowService {
         }
     }
 
-    public static int getNumberOfQuestion() {
-        return numberOfQuestion;
-    }
-
     public static String getUrlWithLanguage(String language) {
         return urlWithLanguage(language);
     }
+
 
 }
