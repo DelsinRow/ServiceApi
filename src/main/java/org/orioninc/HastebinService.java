@@ -9,10 +9,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class HastebinService {
-    private final static String BEARER_TOKEN_HASTEBIN = "Bearer " + System.getenv("TOKEN");
-    private final static String API_ENDPOINTS_HASTEBIN = "https://hastebin.com";
-    private final static String POST_ROUTE_HASTEBIN = "/documents";
+public class HastebinService implements ServicesInterface{
     private final HttpClient client;
 
     public HastebinService(HttpClient client) {
@@ -22,25 +19,16 @@ public class HastebinService {
     public String submitDocument(String allStringQuestions) throws IOException, InterruptedException {
 
         HttpRequest requestPost = HttpRequest.newBuilder()
-                .uri(URI.create(API_ENDPOINTS_HASTEBIN + POST_ROUTE_HASTEBIN))
+                .uri(URI.create(ConstantValues.API_ENDPOINT_HASTEBIN + ConstantValues.POST_ROUTE_HASTEBIN))
                 .header("Content-Type", "text/plain; charset=UTF-8")
-                .header("Authorization", BEARER_TOKEN_HASTEBIN)
+                .header("Authorization", ConstantValues.BEARER_TOKEN_HASTEBIN)
                 .POST(HttpRequest.BodyPublishers.ofString(allStringQuestions))
                 .build();
 
         HttpResponse<String> response = client.send(requestPost, HttpResponse.BodyHandlers.ofString());
         String HastebinString = response.body();
         ObjectMapper objectMapper = new ObjectMapper();
-        HastebinResponse hastebinResponse = objectMapper.readValue(HastebinString, HastebinResponse.class);
-        return hastebinResponse.getKey();
-    }
-
-    public static class HastebinResponse {
-        private String key;
-
-        @JsonProperty("key")
-        public String getKey() {
-            return key;
-        }
+        ServiceResponse serviceResponse = objectMapper.readValue(HastebinString, ServiceResponse.class);
+        return serviceResponse.getKey();
     }
 }

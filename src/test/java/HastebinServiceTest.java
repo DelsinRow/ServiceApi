@@ -3,6 +3,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.orioninc.HastebinService;
+import org.orioninc.ServiceResponse;
 
 import java.io.IOException;
 
@@ -36,7 +37,7 @@ public class HastebinServiceTest {
         String json = mockResponse.body();
         ObjectMapper objectMapper = new ObjectMapper();
         String result = objectMapper
-                .readValue(json, HastebinService.HastebinResponse.class)
+                .readValue(json, ServiceResponse.class)
                 .getKey();
         Assert.assertEquals("testvalue", result);
     }
