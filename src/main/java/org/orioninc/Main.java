@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -13,6 +14,7 @@ public class Main {
         String allQuestions;
         HttpClient client = HttpClient.newHttpClient();
         final long start = System.nanoTime();
+        List<Questions> allQuestionsList = new ArrayList<>();
 
         StackOverflowService stackOverflowService = new StackOverflowService(client);
 
@@ -21,26 +23,34 @@ public class Main {
             for (Languages language : Languages.values()) {
                 if (args[i].equalsIgnoreCase(language.getLanguageName())) {
                     listOfCompletableFutureOfQuestions.add(stackOverflowService.sendRequest(language));
+//                    stackOverflowService.addLanguageInListOfLanguageInRequest(language);
                 }
             }
         }
-        for (CompletableFuture<Questions> completableFutureOfQuestions : listOfCompletableFutureOfQuestions) {
-            stackOverflowService.addQuestionsToFinalList(completableFutureOfQuestions);
-        }
+        CompletableFuture.allOf(listOfCompletableFutureOfQuestions.toArray(CompletableFuture[]::new));
 
-        allQuestions = QuestionsOutput.questions(stackOverflowService.getAllQuestionsList());
+        listOfCompletableFutureOfQuestions.forEach(f -> {
+            try {
+                allQuestionsList.add(f.get());
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
+        allQuestions = QuestionsOutput.questions(allQuestionsList);
+
+        QuestionsSubmitter questionsSubmitter = null;           //remove null
         if (System.getenv("SERVICE").equals("storage")) {
-            StorageService storageService = new StorageService(client, stackOverflowService);
-            key = storageService.submitDocument(allQuestions);
-            System.out.println("Link: " + System.getenv("FQDN") + "/document/" + key);
+            questionsSubmitter = new StorageService(client, stackOverflowService);
         } else if (System.getenv("SERVICE").equals("hastebin")) {
-            HastebinService hastebinService = new HastebinService(client);
-            key = hastebinService.submitDocument(allQuestions);
-            System.out.println("Link: " + "https://hastebin.com/share/" + key);
+            questionsSubmitter = new HastebinService(client);
         }
-
+        key = questionsSubmitter.submitDocument(allQuestions);
+        questionsSubmitter.printFinalLink(key);
 
         System.out.printf("Done in %dms\n", Duration.ofNanos(System.nanoTime() - start).toMillis());
     }
+
 }

@@ -1,3 +1,5 @@
+package org.orioninc;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.orioninc.Languages;
@@ -27,7 +29,6 @@ public class StackOverflowServiceTest {
     private String word = "\"title\"";
     @Test
     public void correctUrlWithLanguage() {
-
         String expectedResult = "https://api.stackexchange.com/2.3/questions?pagesize=10&order=desc&sort=creation&tagged=java&site=stackoverflow&filter=!.yIW41g8Y3qudKNa";
         Assert.assertEquals(expectedResult, stackOverflowService.getUrlWithLanguage(language.getLanguageRequest()));
     }
