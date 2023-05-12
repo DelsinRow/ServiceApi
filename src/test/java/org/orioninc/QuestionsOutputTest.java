@@ -1,3 +1,5 @@
+package org.orioninc;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.orioninc.Questions;

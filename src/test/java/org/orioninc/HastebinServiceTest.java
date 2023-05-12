@@ -1,9 +1,9 @@
+package org.orioninc;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.orioninc.HastebinService;
-import org.orioninc.ServiceResponse;
 
 import java.io.IOException;
 
@@ -38,7 +38,7 @@ public class HastebinServiceTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String result = objectMapper
                 .readValue(json, ServiceResponse.class)
-                .getKey();
+                .key();
         Assert.assertEquals("testvalue", result);
     }
 
