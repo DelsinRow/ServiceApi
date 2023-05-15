@@ -18,18 +18,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.zip.GZIPInputStream;
 
 public class StackOverflowService {
-    private List<String> listOfLanguageInRequest = new ArrayList<>();
     private HttpClient client;
     private static String urlWithLanguage(String language) {
         return ConstantValues.STACKOVERFLOW_API_ENDPOINT + "/2.3/questions?pagesize=" + ConstantValues.STACKOVERFLOW_NUMBER_OF_QUESTIONS + "&order=desc&sort=creation&tagged=" + language + "&site=stackoverflow&filter=!.yIW41g8Y3qudKNa";
-    }
-
-    private void addLanguageInListOfLanguageInRequest(Languages language) {
-        listOfLanguageInRequest.add(language.getLanguageName());
-    }
-
-    public List<String> getListOfLanguageInRequest() {
-        return listOfLanguageInRequest;
     }
 
     public StackOverflowService(HttpClient client) {
@@ -37,7 +28,6 @@ public class StackOverflowService {
     }
 
     private HttpRequest requestConnection(Languages language) {
-        addLanguageInListOfLanguageInRequest(language);
         return HttpRequest.newBuilder()
                 .uri(URI.create(urlWithLanguage(language.getLanguageRequest())))
                 .header("Content-Type", "text/plain; charset=UTF-8")
@@ -86,7 +76,7 @@ public class StackOverflowService {
                     })
                     .thenApply(stringArray -> {
                         try {
-                            return new Questions(questionsList(language, stringArray));
+                            return new Questions(questionsList(language, stringArray), language.getLanguageName());
                         } catch (JsonProcessingException e) {
                             throw new RuntimeException(e);
                         }

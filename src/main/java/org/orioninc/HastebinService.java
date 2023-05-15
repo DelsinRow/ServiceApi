@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 public class HastebinService implements QuestionsSubmitter {
     public static String hastebinToken = "Bearer " + System.getenv("TOKEN");
@@ -17,13 +18,14 @@ public class HastebinService implements QuestionsSubmitter {
     }
 
     @Override
-    public String submitDocument(String allStringQuestions) throws IOException, InterruptedException {
+    public String submitDocument(List<Questions> allQuestionsList) throws IOException, InterruptedException {
+        String allQuestionsInString = QuestionsOutput.questions(allQuestionsList);
 
         HttpRequest requestPost = HttpRequest.newBuilder()
                 .uri(URI.create(ConstantValues.HASTEBIN_API_ENDPOINT + ConstantValues.HASTEBIN_POST_ROUTE))
                 .header("Content-Type", "text/plain; charset=UTF-8")
                 .header("Authorization", hastebinToken)
-                .POST(HttpRequest.BodyPublishers.ofString(allStringQuestions))
+                .POST(HttpRequest.BodyPublishers.ofString(allQuestionsInString))
                 .build();
 
         HttpResponse<String> response = client.send(requestPost, HttpResponse.BodyHandlers.ofString());
