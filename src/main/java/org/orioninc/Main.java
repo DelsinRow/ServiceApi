@@ -9,9 +9,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class Main {
+    private static QuestionsSubmitter questionsSubmitter;
     public static void main(String[] args) throws IOException, InterruptedException {
         String key;
-        String allQuestions;
         HttpClient client = HttpClient.newHttpClient();
         final long start = System.nanoTime();
         List<Questions> allQuestionsList = new ArrayList<>();
@@ -23,7 +23,6 @@ public class Main {
             for (Languages language : Languages.values()) {
                 if (args[i].equalsIgnoreCase(language.getLanguageName())) {
                     listOfCompletableFutureOfQuestions.add(stackOverflowService.sendRequest(language));
-//                    stackOverflowService.addLanguageInListOfLanguageInRequest(language);
                 }
             }
         }
@@ -39,15 +38,15 @@ public class Main {
             }
         });
 
-        allQuestions = QuestionsOutput.questions(allQuestionsList);
-
-        QuestionsSubmitter questionsSubmitter = null;           //remove null
         if (System.getenv("SERVICE").equals("storage")) {
-            questionsSubmitter = new StorageService(client, stackOverflowService);
+            questionsSubmitter = new StorageService(client);
         } else if (System.getenv("SERVICE").equals("hastebin")) {
             questionsSubmitter = new HastebinService(client);
+        } else {
+            System.out.println("ERROR. Unknown service: " + System.getenv("SERVICE"));
+            System.exit(1);
         }
-        key = questionsSubmitter.submitDocument(allQuestions);
+        key = questionsSubmitter.submitDocument(allQuestionsList);
         questionsSubmitter.printFinalLink(key);
 
         System.out.printf("Done in %dms\n", Duration.ofNanos(System.nanoTime() - start).toMillis());
