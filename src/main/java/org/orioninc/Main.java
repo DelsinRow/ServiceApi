@@ -39,7 +39,7 @@ public class Main {
         });
 
         if (System.getenv("SERVICE").equals("storage")) {
-            questionsSubmitter = new StorageService(client, stackOverflowService);
+            questionsSubmitter = new StorageService(client);
         } else if (System.getenv("SERVICE").equals("hastebin")) {
             questionsSubmitter = new HastebinService(client);
         } else {

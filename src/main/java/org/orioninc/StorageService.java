@@ -12,12 +12,10 @@ import java.util.List;
 
 public class StorageService implements QuestionsSubmitter {
     private final HttpClient client;
-    private final StackOverflowService stackOverflowService;
     public static String apiEndpointStorageservice = System.getenv("STORAGESERVICE_API_ENDPOINT");
     public  String storageservice_document_link = System.getenv("STORAGESERVICE_API_ENDPOINT") + "/document/";
-    public StorageService(HttpClient client, StackOverflowService stackOverflowService) {
+    public StorageService(HttpClient client) {
         this.client = client;
-        this.stackOverflowService = stackOverflowService;
     }
 
     String customTitle (List<Questions> allQuestionsList) {
