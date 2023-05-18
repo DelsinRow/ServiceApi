@@ -12,30 +12,32 @@ import java.util.List;
 
 public class StorageService implements QuestionsSubmitter {
     private final HttpClient client;
-    public static String apiEndpointStorageservice = System.getenv("STORAGESERVICE_API_ENDPOINT");
-    public  String storageservice_document_link = System.getenv("STORAGESERVICE_API_ENDPOINT") + "/document/";
-    public StorageService(HttpClient client) {
+    private final String link;
+
+    public StorageService(HttpClient client, String link) {
         this.client = client;
+        this.link = link;
     }
 
-    String customTitle (List<Questions> allQuestionsList) {
+    String customTitle(List<Questions> allQuestionsList) {
         List<String> listOfLanguage = new ArrayList<>();
-        for(Questions questions : allQuestionsList) {
+        for (Questions questions : allQuestionsList) {
             listOfLanguage.add(questions.tag());
         }
         StringBuilder sb = new StringBuilder();
-        for(String languageName : listOfLanguage) {
+        for (String languageName : listOfLanguage) {
             sb.append(languageName).append(", ");
         }
-        sb.deleteCharAt(sb.length()-2);
-        return  ConstantValues.STACKOVERFLOW_NUMBER_OF_QUESTIONS + " questions by next language: " + sb.toString();
+        sb.deleteCharAt(sb.length() - 2);
+        return ConstantValues.STACKOVERFLOW_NUMBER_OF_QUESTIONS + " questions by next language: " + sb.toString();
     }
 
     public String submitDocument(List<Questions> allQuestionsList) throws IOException, InterruptedException {
         String allQuestionsInString = QuestionsOutput.questions(allQuestionsList);
+        String key;
 
         HttpRequest requestPost = HttpRequest.newBuilder()
-                .uri(URI.create(apiEndpointStorageservice + ConstantValues.STORAGESERVICE_POST_ROUTE))
+                .uri(URI.create(link + ConstantValues.STORAGESERVICE_POST_ROUTE))
                 .header("Content-Type", "text/plain; charset=UTF-8")
                 .setHeader("title", customTitle(allQuestionsList))
                 .setHeader("source", ConstantValues.SERVICE_API_HEADER_SOURCE)
@@ -46,11 +48,10 @@ public class StorageService implements QuestionsSubmitter {
         String StorageString = response.body();
         ObjectMapper objectMapper = new ObjectMapper();
         ServiceResponse serviceResponse = objectMapper.readValue(StorageString, ServiceResponse.class);
-        return serviceResponse.key();
+        return buildFinalLink(serviceResponse.key());
     }
 
-    @Override
-    public void printFinalLink(String key){
-        System.out.println(storageservice_document_link + key);
+    public String buildFinalLink(String key) {
+        return link + "/document/" + key;
     }
 }

@@ -10,11 +10,12 @@ import java.net.http.HttpResponse;
 import java.util.List;
 
 public class HastebinService implements QuestionsSubmitter {
-    public static String hastebinToken = "Bearer " + System.getenv("TOKEN");
     private final HttpClient client;
+    private final String token;
 
-    public HastebinService(HttpClient client) {
+    public HastebinService(HttpClient client, String token) {
         this.client = client;
+        this.token = token;
     }
 
     @Override
@@ -24,7 +25,7 @@ public class HastebinService implements QuestionsSubmitter {
         HttpRequest requestPost = HttpRequest.newBuilder()
                 .uri(URI.create(ConstantValues.HASTEBIN_API_ENDPOINT + ConstantValues.HASTEBIN_POST_ROUTE))
                 .header("Content-Type", "text/plain; charset=UTF-8")
-                .header("Authorization", hastebinToken)
+                .header("Authorization", "Bearer " + token)
                 .POST(HttpRequest.BodyPublishers.ofString(allQuestionsInString))
                 .build();
 
@@ -32,11 +33,10 @@ public class HastebinService implements QuestionsSubmitter {
         String HastebinString = response.body();
         ObjectMapper objectMapper = new ObjectMapper();
         ServiceResponse serviceResponse = objectMapper.readValue(HastebinString, ServiceResponse.class);
-        return serviceResponse.key();
+        return buildFinalLink(serviceResponse.key());
     }
 
-    @Override
-    public void printFinalLink(String key){
-        System.out.println(ConstantValues.HASTEBIN_DOCUMENT_LINK + key);
+    public String buildFinalLink(String key) {
+        return ConstantValues.HASTEBIN_DOCUMENT_LINK + key;
     }
 }

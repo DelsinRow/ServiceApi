@@ -1,30 +1,41 @@
 package org.orioninc;
 
 public enum Languages {
-    JAVA("java", "Java"),
-    JAVASCRIPT("javascript", "Javascript"),
-    PYTHON("python", "Python"),
-    C_SHARP("c%23", "C#"),
-    PHP("php", "PHP"),
-    HTML("html", "HTML"),
-    C_PLUS_PLUS("c++", "C++"),
-    CSS("css", "CSS"),
-    SQL("sql", "SQL"),
-    RUBY("ruby", "Ruby");
+    JAVA("Java"),
+    JAVASCRIPT("Javascript"),
+    PYTHON("Python"),
+    C_SHARP("C#"),
+    PHP("PHP"),
+    HTML("HTML"),
+    C_PLUS_PLUS("C++"),
+    CSS("CSS"),
+    SQL("SQL"),
+    RUBY("Ruby");
 
-    private final String languageName;
-    private final String languageRequest;
+    private final String name;
 
-    Languages(String languageRequest, String languageName) {
-        this.languageName = languageName;
-        this.languageRequest = languageRequest;
+    Languages(String name) {
+        this.name = name;
     }
 
-    public String getLanguageName() {
-        return languageName;
+    public String getName() {
+        return name;
     }
 
-    public String getLanguageRequest() {
-        return languageRequest;
+    public static Languages findByLanguage(String name) {
+        Languages result = null;
+        for (Languages languages : values()) {
+            if (languages.name.equalsIgnoreCase(name)) {
+                result = languages;
+                break;
+            }
+        }
+        return result;
+    }
+
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
