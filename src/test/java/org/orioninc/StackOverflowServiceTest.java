@@ -27,11 +27,6 @@ public class StackOverflowServiceTest {
     private StackOverflowService stackOverflowService = new StackOverflowService(mockClient);
     private Languages language = Languages.JAVA;
     private String word = "\"title\"";
-    @Test
-    public void correctUrlWithLanguage() {
-        String expectedResult = "https://api.stackexchange.com/2.3/questions?pagesize=10&order=desc&sort=creation&tagged=java&site=stackoverflow&filter=!.yIW41g8Y3qudKNa";
-        Assert.assertEquals(expectedResult, stackOverflowService.getUrlWithLanguage(language.getLanguageRequest()));
-    }
 
     @Test
     public void questionsListTest() throws InterruptedException, ExecutionException {
@@ -71,7 +66,7 @@ public class StackOverflowServiceTest {
                 .filter(word::equals)
                 .count() + 1;
         Assert.assertNotNull(questions.get().title());
-        Assert.assertEquals(("-----> " + language.getLanguageName() + " <-----"), questions.get().title().get(0));
+        Assert.assertEquals(("-----> " + language.getName() + " <-----"), questions.get().title().get(0));
         Assert.assertEquals((indexArrayTest + ") Load resources file before all test execution in JUnit").length(), questions.get().title().get(indexArrayTest).length());
         Assert.assertEquals(count, questions.get().title().size() - 1);
 

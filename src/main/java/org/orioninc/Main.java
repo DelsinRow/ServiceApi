@@ -3,53 +3,60 @@ package org.orioninc;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.Duration;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.Set;
 
 public class Main {
-    private static QuestionsSubmitter questionsSubmitter;
+    private final static long start = System.nanoTime();
+
     public static void main(String[] args) throws IOException, InterruptedException {
-        String key;
+        String service = System.getenv("SERVICE");
+        String token = System.getenv("TOKEN");
+        String storageserviceLink = System.getenv("STORAGESERVICE_API_ENDPOINT");
+
+        if (!service.equalsIgnoreCase("storage") && !service.equalsIgnoreCase("hastebin")) {
+            fatal("ERROR. Unknown service: " + service);
+        }
+        if (service.equalsIgnoreCase("storage") && storageserviceLink.isEmpty()) {
+            fatal("Storage Service link is required for Storage Service");
+        }
+        if (service.equalsIgnoreCase("hastebin") && token.isEmpty()) {
+            fatal("Token is required for Hastebin service");
+        }
+
+        Set<Languages> languages = new HashSet<>();
+        for (String arg : args) {
+            Languages lang = Languages.findByLanguage(arg);
+            if (lang != null) {
+                languages.add(lang);
+            } else {
+                System.out.println(arg + " will be ignored");
+            }
+        }
+
+        System.out.println("Query languages: " + languages);
+
         HttpClient client = HttpClient.newHttpClient();
-        final long start = System.nanoTime();
-        List<Questions> allQuestionsList = new ArrayList<>();
-
         StackOverflowService stackOverflowService = new StackOverflowService(client);
+        QuestionsSubmitter questionsSubmitter = null;
 
-        List<CompletableFuture<Questions>> listOfCompletableFutureOfQuestions = new ArrayList<>();
-        for (int i = 0; i < args.length; i++) {
-            for (Languages language : Languages.values()) {
-                if (args[i].equalsIgnoreCase(language.getLanguageName())) {
-                    listOfCompletableFutureOfQuestions.add(stackOverflowService.sendRequest(language));
-                }
-            }
+        if (service.equalsIgnoreCase("storage")) {
+            questionsSubmitter = new StorageService(client, storageserviceLink);
+        } else if (service.equalsIgnoreCase("hastebin")) {
+            questionsSubmitter = new HastebinService(client, token);
         }
-        CompletableFuture.allOf(listOfCompletableFutureOfQuestions.toArray(CompletableFuture[]::new));
 
-        listOfCompletableFutureOfQuestions.forEach(f -> {
-            try {
-                allQuestionsList.add(f.get());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        if (System.getenv("SERVICE").equals("storage")) {
-            questionsSubmitter = new StorageService(client);
-        } else if (System.getenv("SERVICE").equals("hastebin")) {
-            questionsSubmitter = new HastebinService(client);
-        } else {
-            System.out.println("ERROR. Unknown service: " + System.getenv("SERVICE"));
-            System.exit(1);
-        }
-        key = questionsSubmitter.submitDocument(allQuestionsList);
-        questionsSubmitter.printFinalLink(key);
+        List<Questions> allQuestionList = stackOverflowService.getQuestions(languages);
+        String link = questionsSubmitter.submitDocument(allQuestionList);
+        System.out.println(link);
 
         System.out.printf("Done in %dms\n", Duration.ofNanos(System.nanoTime() - start).toMillis());
+    }
+
+    private static void fatal(String message) {
+        System.err.println(message);
+        System.exit(1);
     }
 
 }
